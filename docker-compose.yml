@@ -1,0 +1,29 @@
+services:
+  backend:
+    build: ./backend
+    container_name: wa-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:////data/analyzer.db
+      - UPLOAD_DIR=/data/uploads
+      - SESSION_TTL_HOURS=24
+      - MAX_UPLOAD_SIZE_MB=50
+      - CORS_ORIGINS=["http://localhost:3000"]
+    volumes:
+      - wa-data:/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: wa-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  wa-data:
